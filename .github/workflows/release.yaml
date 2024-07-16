@@ -58,6 +58,8 @@ jobs:
       - name: Install script dependencies
         if: env.DEPLOY_TARGET == 'prod'
         run: yarn install --immutable
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=${{ ((env.DEPLOY_TARGET == 'prod') && 'production') || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Build Project Artifacts
