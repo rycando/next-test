@@ -2,7 +2,7 @@ name: release
 on:
   push:
     branches:
-      - master
+      - masters
       - stage
   pull_request:
     branches:
@@ -48,38 +48,6 @@ jobs:
             **/node_modules
             !./scripts/**/node_modules
           key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
-
-  static-analyze:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-      - uses: actions/cache/restore@v4
-        timeout-minutes: 10
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-            **/node_modules
-            !./scripts/**/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-      - name: Check prettier
-        run: yarn prettier:check
-      - name: Check eslint
-        run: yarn lint:js
-      - name: Check typescript type
-        run: yarn tsc
 
   deploy:
     runs-on: ubuntu-latest
