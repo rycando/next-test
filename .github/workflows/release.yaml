@@ -58,7 +58,6 @@ jobs:
       - name: Install script dependencies
         if: env.DEPLOY_TARGET == 'prod'
         run: yarn install --immutable
-        working-directory: ./scripts/slackNotify
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Build Project Artifacts
