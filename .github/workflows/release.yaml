@@ -67,5 +67,7 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
         id: deploy-to-vercel
         run: echo "deployed-url=$(vercel deploy --prebuilt ${{ ((env.DEPLOY_TARGET == 'prod') && '--prod') || ''  }} --token=${{ secrets.GH_ACTIONS_VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+      - name: check output
+        run: echo ${{ steps.deploy-to-vercel.outputs.deployed-url }}
       # - name: Alias Domain to Vercel
       #   run: vercel alias set ${{ steps.deploy-to-vercel.outputs.deployed-url }} ${{ ((env.DEPLOY_TARGET == 'prod') && 'form.modusign.co.kr') || 'form-stage.modusign.co.kr'  }}
