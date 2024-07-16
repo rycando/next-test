@@ -1,0 +1,17 @@
+diff --git a/scripts/build.js b/scripts/build.js
+index 7a3a635a5d3b9448e02e80f5d44b0f6056edc316..dac47512a1d1cbfb2bfea7d8276fb05d055685ff 100644
+--- a/scripts/build.js
++++ b/scripts/build.js
+@@ -214,6 +214,12 @@ function build(previousFileSizes) {
+ 
+       return resolve(resolveArgs);
+     });
++    /** @see https://github.com/facebook/create-react-app/pull/12391 */
++  }).then(res => {
++    compiler.close(closeErr => {
++      closeErr && console.error(closeErr);
++    });
++    return res;
+   });
+ }
+ 

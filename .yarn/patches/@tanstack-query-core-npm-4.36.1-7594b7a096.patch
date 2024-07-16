@@ -1,0 +1,185 @@
+diff --git a/.prettierignore b/.prettierignore
+new file mode 100644
+index 0000000000000000000000000000000000000000..f59ec20aabf5842d237244ece8c81ab184faeac1
+--- /dev/null
++++ b/.prettierignore
+@@ -0,0 +1 @@
++*
+\ No newline at end of file
+diff --git a/build/lib/queryObserver.js b/build/lib/queryObserver.js
+index f940eca38a9a5296afa5875518b8686164db3f11..803f7bdcacb1e2c351e9b74c31ccf2b9454a3fac 100644
+--- a/build/lib/queryObserver.js
++++ b/build/lib/queryObserver.js
+@@ -369,15 +369,15 @@ class QueryObserver extends subscribable.Subscribable {
+     }
+ 
+     const isFetching = fetchStatus === 'fetching';
+-    const isLoading = status === 'loading';
++    const isPending = status === 'loading';
+     const isError = status === 'error';
+     const result = {
+       status,
+       fetchStatus,
+-      isLoading,
++      isPending,
+       isSuccess: status === 'success',
+       isError,
+-      isInitialLoading: isLoading && isFetching,
++      isLoading: isPending && isFetching,
+       data,
+       dataUpdatedAt,
+       error,
+@@ -388,7 +388,7 @@ class QueryObserver extends subscribable.Subscribable {
+       isFetched: state.dataUpdateCount > 0 || state.errorUpdateCount > 0,
+       isFetchedAfterMount: state.dataUpdateCount > queryInitialState.dataUpdateCount || state.errorUpdateCount > queryInitialState.errorUpdateCount,
+       isFetching,
+-      isRefetching: isFetching && !isLoading,
++      isRefetching: isFetching && !isPending,
+       isLoadingError: isError && state.dataUpdatedAt === 0,
+       isPaused: fetchStatus === 'paused',
+       isPlaceholderData,
+diff --git a/build/lib/queryObserver.mjs b/build/lib/queryObserver.mjs
+index 83854ad07f0b29c00a3b901d5405d741e4342590..a2b8acb573572fedf779416416593b1ec5effe22 100644
+--- a/build/lib/queryObserver.mjs
++++ b/build/lib/queryObserver.mjs
+@@ -365,15 +365,15 @@ class QueryObserver extends Subscribable {
+     }
+ 
+     const isFetching = fetchStatus === 'fetching';
+-    const isLoading = status === 'loading';
++    const isPending = status === 'loading';
+     const isError = status === 'error';
+     const result = {
+       status,
+       fetchStatus,
+-      isLoading,
++      isPending,
+       isSuccess: status === 'success',
+       isError,
+-      isInitialLoading: isLoading && isFetching,
++      isLoading: isPending && isFetching,
+       data,
+       dataUpdatedAt,
+       error,
+@@ -384,7 +384,7 @@ class QueryObserver extends Subscribable {
+       isFetched: state.dataUpdateCount > 0 || state.errorUpdateCount > 0,
+       isFetchedAfterMount: state.dataUpdateCount > queryInitialState.dataUpdateCount || state.errorUpdateCount > queryInitialState.errorUpdateCount,
+       isFetching,
+-      isRefetching: isFetching && !isLoading,
++      isRefetching: isFetching && !isPending,
+       isLoadingError: isError && state.dataUpdatedAt === 0,
+       isPaused: fetchStatus === 'paused',
+       isPlaceholderData,
+diff --git a/build/lib/types.d.ts b/build/lib/types.d.ts
+index cbc511ee7d39f9ed01127de2a7f66b01f6532852..02d9971d74b0f564149d75ecf26c1ca7d23eb4eb 100644
+--- a/build/lib/types.d.ts
++++ b/build/lib/types.d.ts
+@@ -253,10 +253,21 @@ export interface QueryObserverBaseResult<TData = unknown, TError = unknown> {
+     status: QueryStatus;
+     fetchStatus: FetchStatus;
+ }
++export interface QueryObserverPendingResult<TData = unknown, TError = unknown> extends QueryObserverBaseResult<TData, TError> {
++    data: undefined;
++    error: null;
++    isError: false;
++    isPending: true;
++    isLoadingError: false;
++    isRefetchError: false;
++    isSuccess: false;
++    status: 'loading';
++}
+ export interface QueryObserverLoadingResult<TData = unknown, TError = unknown> extends QueryObserverBaseResult<TData, TError> {
+     data: undefined;
+     error: null;
+     isError: false;
++    isPending: true;
+     isLoading: true;
+     isLoadingError: false;
+     isRefetchError: false;
+@@ -267,6 +278,7 @@ export interface QueryObserverLoadingErrorResult<TData = unknown, TError = unkno
+     data: undefined;
+     error: TError;
+     isError: true;
++    isPending: false;
+     isLoading: false;
+     isLoadingError: true;
+     isRefetchError: false;
+@@ -277,6 +289,7 @@ export interface QueryObserverRefetchErrorResult<TData = unknown, TError = unkno
+     data: TData;
+     error: TError;
+     isError: true;
++    isPending: false;
+     isLoading: false;
+     isLoadingError: false;
+     isRefetchError: true;
+@@ -287,6 +300,7 @@ export interface QueryObserverSuccessResult<TData = unknown, TError = unknown> e
+     data: TData;
+     error: null;
+     isError: false;
++    isPending: false
+     isLoading: false;
+     isLoadingError: false;
+     isRefetchError: false;
+@@ -294,7 +308,7 @@ export interface QueryObserverSuccessResult<TData = unknown, TError = unknown> e
+     status: 'success';
+ }
+ export declare type DefinedQueryObserverResult<TData = unknown, TError = unknown> = QueryObserverRefetchErrorResult<TData, TError> | QueryObserverSuccessResult<TData, TError>;
+-export declare type QueryObserverResult<TData = unknown, TError = unknown> = DefinedQueryObserverResult<TData, TError> | QueryObserverLoadingErrorResult<TData, TError> | QueryObserverLoadingResult<TData, TError>;
++export declare type QueryObserverResult<TData = unknown, TError = unknown> = DefinedQueryObserverResult<TData, TError> | QueryObserverLoadingErrorResult<TData, TError> | QueryObserverLoadingResult<TData, TError> | QueryObserverPendingResult<TData, TError>;
+ export interface InfiniteQueryObserverBaseResult<TData = unknown, TError = unknown> extends QueryObserverBaseResult<InfiniteData<TData>, TError> {
+     fetchNextPage: (options?: FetchNextPageOptions) => Promise<InfiniteQueryObserverResult<TData, TError>>;
+     fetchPreviousPage: (options?: FetchPreviousPageOptions) => Promise<InfiniteQueryObserverResult<TData, TError>>;
+@@ -303,10 +317,21 @@ export interface InfiniteQueryObserverBaseResult<TData = unknown, TError = unkno
+     isFetchingNextPage: boolean;
+     isFetchingPreviousPage: boolean;
+ }
++export interface InfiniteQueryObserverPendingResult<TData = unknown, TError = unknown> extends InfiniteQueryObserverBaseResult<TData, TError> {
++    data: undefined;
++    error: null;
++    isError: false;
++    isPending: true;
++    isLoadingError: false;
++    isRefetchError: false;
++    isSuccess: false;
++    status: 'loading';
++}
+ export interface InfiniteQueryObserverLoadingResult<TData = unknown, TError = unknown> extends InfiniteQueryObserverBaseResult<TData, TError> {
+     data: undefined;
+     error: null;
+     isError: false;
++    isPending: true;
+     isLoading: true;
+     isLoadingError: false;
+     isRefetchError: false;
+@@ -317,6 +342,7 @@ export interface InfiniteQueryObserverLoadingErrorResult<TData = unknown, TError
+     data: undefined;
+     error: TError;
+     isError: true;
++    isPending: false;
+     isLoading: false;
+     isLoadingError: true;
+     isRefetchError: false;
+@@ -327,6 +353,7 @@ export interface InfiniteQueryObserverRefetchErrorResult<TData = unknown, TError
+     data: InfiniteData<TData>;
+     error: TError;
+     isError: true;
++    isPending: false;
+     isLoading: false;
+     isLoadingError: false;
+     isRefetchError: true;
+@@ -337,13 +364,14 @@ export interface InfiniteQueryObserverSuccessResult<TData = unknown, TError = un
+     data: InfiniteData<TData>;
+     error: null;
+     isError: false;
++    isPending: false;
+     isLoading: false;
+     isLoadingError: false;
+     isRefetchError: false;
+     isSuccess: true;
+     status: 'success';
+ }
+-export declare type InfiniteQueryObserverResult<TData = unknown, TError = unknown> = InfiniteQueryObserverLoadingErrorResult<TData, TError> | InfiniteQueryObserverLoadingResult<TData, TError> | InfiniteQueryObserverRefetchErrorResult<TData, TError> | InfiniteQueryObserverSuccessResult<TData, TError>;
++export declare type InfiniteQueryObserverResult<TData = unknown, TError = unknown> = InfiniteQueryObserverLoadingErrorResult<TData, TError> | InfiniteQueryObserverLoadingResult<TData, TError> | InfiniteQueryObserverRefetchErrorResult<TData, TError> | InfiniteQueryObserverSuccessResult<TData, TError> | InfiniteQueryObserverPendingResult<TData, TError>;
+ export declare type MutationKey = readonly unknown[];
+ export declare type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
+ export interface MutationMeta {

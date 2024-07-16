@@ -1,0 +1,101 @@
+name: release
+on:
+  push:
+    branches:
+      - master
+      - stage
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  DEPLOY_TARGET: ${{ (github.ref == 'refs/heads/main' && 'prod')|| (github.ref == 'refs/heads/stage' && 'stage') || 'preview' }}
+  VERCEL_ORG_ID: team_soCklNDTKDttFPPmgVM6BHKU
+  VERCEL_PROJECT_ID: prj_uSLsj4TjVaoOR99tuPlKW0sycZrP
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 10
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+            !./scripts/**/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn
+      - name: Install dependencies
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn install --immutable
+      - uses: actions/cache/save@v4
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        timeout-minutes: 10
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+            !./scripts/**/node_modules
+          key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
+
+  static-analyze:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache/restore@v4
+        timeout-minutes: 10
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+            !./scripts/**/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Check prettier
+        run: yarn prettier:check
+      - name: Check eslint
+        run: yarn lint:js
+      - name: Check typescript type
+        run: yarn tsc
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: (github.ref == 'refs/heads/main') && github.event_name == 'push' && needs.release.outputs.releasable == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install script dependencies
+        if: env.DEPLOY_TARGET == 'prod'
+        run: yarn install --immutable
+        working-directory: ./scripts/slackNotify
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Build Project Artifacts
+        run: vercel build ${{ ((env.DEPLOY_TARGET == 'prod') && '--prod') || ''  }} --token=${{ secrets.GH_ACTIONS_VERCEL_TOKEN }} 
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy-to-vercel
+        run: echo "deployed-url=$(vercel deploy --prebuilt ${{ ((env.DEPLOY_TARGET == 'prod') && '--prod') || ''  }} --token=${{ secrets.GH_ACTIONS_VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+      # - name: Alias Domain to Vercel
+      #   run: vercel alias set ${{ steps.deploy-to-vercel.outputs.deployed-url }} ${{ ((env.DEPLOY_TARGET == 'prod') && 'form.modusign.co.kr') || 'form-stage.modusign.co.kr'  }}

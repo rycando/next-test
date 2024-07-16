@@ -1,0 +1,96 @@
+diff --git a/build/es5/actions.d.ts b/build/es5/actions.d.ts
+index 7e7641d9f687010dcf1a59d445818c23e846e9ab..5f817551568df02be77ec2580ce4062eee7e513f 100644
+--- a/build/es5/actions.d.ts
++++ b/build/es5/actions.d.ts
+@@ -17,8 +17,8 @@ export interface CallHistoryMethodAction<A = unknown[]> {
+     type: typeof CALL_HISTORY_METHOD;
+     payload: LocationActionPayload<A>;
+ }
+-export declare const push: (...args: Parameters<History['push']>) => CallHistoryMethodAction<Parameters<History['push']>>;
+-export declare const replace: (...args: Parameters<History['replace']>) => CallHistoryMethodAction<Parameters<History['replace']>>;
++export declare function push<S = History.LocationState>(...args: Parameters<History<S>['push']>): CallHistoryMethodAction<Parameters<History['push']>>;
++export declare function replace<S = History.LocationState>(...args: Parameters<History<S>['replace']>): CallHistoryMethodAction<Parameters<History['replace']>>;
+ export declare const go: (...args: Parameters<History['go']>) => CallHistoryMethodAction<Parameters<History['go']>>;
+ export declare const goBack: () => CallHistoryMethodAction<Parameters<History['goBack']>>;
+ export declare const goForward: () => CallHistoryMethodAction<Parameters<History['goForward']>>;
+diff --git a/build/es5/actions.js b/build/es5/actions.js
+index b68fb8ec27d717dabdd0c9cab0345a2ff1f2164d..ce374d14ece7068bfa413db71eb364d27d560f76 100644
+--- a/build/es5/actions.js
++++ b/build/es5/actions.js
+@@ -21,8 +21,22 @@ function updateLocation(method) {
+         });
+     };
+ }
+-exports.push = updateLocation('push');
+-exports.replace = updateLocation('replace');
++function push() {
++    var args = [];
++    for (var _i = 0; _i < arguments.length; _i++) {
++        args[_i] = arguments[_i];
++    }
++    return updateLocation('push').apply(void 0, args);
++}
++exports.push = push;
++function replace() {
++    var args = [];
++    for (var _i = 0; _i < arguments.length; _i++) {
++        args[_i] = arguments[_i];
++    }
++    return updateLocation('replace').apply(void 0, args);
++}
++exports.replace = replace;
+ exports.go = updateLocation('go');
+ exports.goBack = updateLocation('goBack');
+ exports.goForward = updateLocation('goForward');
+diff --git a/build/es5/actions.js.map b/build/es5/actions.js.map
+index beb764778044b9da3b5b9397c23e08519956db4c..0898b26f9d38be8747007a3562c8f1ad3b3bded7 100644
+--- a/build/es5/actions.js.map
++++ b/build/es5/actions.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"actions.js","sourceRoot":"","sources":["../../src/actions.ts"],"names":[],"mappings":";;;AAEa,QAAA,mBAAmB,GAAG,8BAA8B,CAAC;AACrD,QAAA,eAAe,GAAG,0BAA0B,CAAC;AAYnD,IAAM,oBAAoB,GAAG,UAAC,QAAkB,EAAE,MAAc,IAAK,OAAA,CAAC;IAC1E,IAAI,EAAE,uBAAyC;IAC/C,OAAO,EAAE,EAAE,QAAQ,UAAA,EAAE,MAAM,QAAA,EAA4C;CACzE,CAAC,EAH0E,CAG1E,CAAC;AAHU,QAAA,oBAAoB,wBAG9B;AAYH,SAAS,cAAc,CAA2B,MAAS;IACxD,gDAAgD;IAChD,OAAO;QAAC,cAA+B;aAA/B,UAA+B,EAA/B,qBAA+B,EAA/B,IAA+B;YAA/B,yBAA+B;;QAAsD,OAAA,CAAC;YAC3F,IAAI,EAAE,2BAAiD;YACvD,OAAO,EAAE,EAAE,MAAM,QAAA,EAAE,IAAI,MAAA,EAAE;SAC3B,CAAC;IAH2F,CAG3F,CAAC;AACN,CAAC;AAEY,QAAA,IAAI,GAE2C,cAAc,CAAC,MAAM,CAAC,CAAC;AACtE,QAAA,OAAO,GAE2C,cAAc,CAAC,SAAS,CAAC,CAAC;AAC5E,QAAA,EAAE,GAE2C,cAAc,CAAC,IAAI,CAAC,CAAC;AAClE,QAAA,MAAM,GAChB,cAAc,CAAC,QAAQ,CAAC,CAAC;AACf,QAAA,SAAS,GACnB,cAAc,CAAC,WAAW,CAAC,CAAC;AAC/B,gDAAgD;AACnC,QAAA,IAAI,GACd,cAAc,CAAC,MAAM,CAAC,CAAC;AAC1B,gDAAgD;AACnC,QAAA,OAAO,GACjB,cAAc,CAAC,SAAS,CAAC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"actions.js","sourceRoot":"","sources":["../../src/actions.ts"],"names":[],"mappings":";;;AAEa,QAAA,mBAAmB,GAAG,8BAA8B,CAAC;AACrD,QAAA,eAAe,GAAG,0BAA0B,CAAC;AAYnD,IAAM,oBAAoB,GAAG,UAAC,QAAkB,EAAE,MAAc,IAAK,OAAA,CAAC;IAC1E,IAAI,EAAE,uBAAyC;IAC/C,OAAO,EAAE,EAAE,QAAQ,UAAA,EAAE,MAAM,QAAA,EAA4C;CACzE,CAAC,EAH0E,CAG1E,CAAC;AAHU,QAAA,oBAAoB,wBAG9B;AAYH,SAAS,cAAc,CAA2B,MAAS;IACxD,gDAAgD;IAChD,OAAO;QAAC,cAA+B;aAA/B,UAA+B,EAA/B,qBAA+B,EAA/B,IAA+B;YAA/B,yBAA+B;;QAAsD,OAAA,CAAC;YAC3F,IAAI,EAAE,2BAAiD;YACvD,OAAO,EAAE,EAAE,MAAM,QAAA,EAAE,IAAI,MAAA,EAAE;SAC3B,CAAC;IAH2F,CAG3F,CAAC;AACN,CAAC;AAED,SAAgB,IAAI;IACjB,cAAuC;SAAvC,UAAuC,EAAvC,qBAAuC,EAAvC,IAAuC;QAAvC,yBAAuC;;IAEvC,OAAO,cAAc,CAAC,MAAM,CAAC,eAAI,IAAI,EAAE;AAC1C,CAAC;AAJD,oBAIC;AACD,SAAgB,OAAO;IACpB,cAA0C;SAA1C,UAA0C,EAA1C,qBAA0C,EAA1C,IAA0C;QAA1C,yBAA0C;;IAE1C,OAAO,cAAc,CAAC,SAAS,CAAC,eAAI,IAAI,EAAE;AAC7C,CAAC;AAJD,0BAIC;AACY,QAAA,EAAE,GAE2C,cAAc,CAAC,IAAI,CAAC,CAAC;AAClE,QAAA,MAAM,GAChB,cAAc,CAAC,QAAQ,CAAC,CAAC;AACf,QAAA,SAAS,GACnB,cAAc,CAAC,WAAW,CAAC,CAAC;AAC/B,gDAAgD;AACnC,QAAA,IAAI,GACd,cAAc,CAAC,MAAM,CAAC,CAAC;AAC1B,gDAAgD;AACnC,QAAA,OAAO,GACjB,cAAc,CAAC,SAAS,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/build/es6/actions.d.ts b/build/es6/actions.d.ts
+index 7e7641d9f687010dcf1a59d445818c23e846e9ab..5f817551568df02be77ec2580ce4062eee7e513f 100644
+--- a/build/es6/actions.d.ts
++++ b/build/es6/actions.d.ts
+@@ -17,8 +17,8 @@ export interface CallHistoryMethodAction<A = unknown[]> {
+     type: typeof CALL_HISTORY_METHOD;
+     payload: LocationActionPayload<A>;
+ }
+-export declare const push: (...args: Parameters<History['push']>) => CallHistoryMethodAction<Parameters<History['push']>>;
+-export declare const replace: (...args: Parameters<History['replace']>) => CallHistoryMethodAction<Parameters<History['replace']>>;
++export declare function push<S = History.LocationState>(...args: Parameters<History<S>['push']>): CallHistoryMethodAction<Parameters<History['push']>>;
++export declare function replace<S = History.LocationState>(...args: Parameters<History<S>['replace']>): CallHistoryMethodAction<Parameters<History['replace']>>;
+ export declare const go: (...args: Parameters<History['go']>) => CallHistoryMethodAction<Parameters<History['go']>>;
+ export declare const goBack: () => CallHistoryMethodAction<Parameters<History['goBack']>>;
+ export declare const goForward: () => CallHistoryMethodAction<Parameters<History['goForward']>>;
+diff --git a/build/es6/actions.js b/build/es6/actions.js
+index 44148916691e98f04c37f64bc0bd01783f4e376f..ea35ad6e9860ce9f8fe4893a94777a237a41ffaf 100644
+--- a/build/es6/actions.js
++++ b/build/es6/actions.js
+@@ -11,8 +11,12 @@ function updateLocation(method) {
+         payload: { method, args },
+     });
+ }
+-export const push = updateLocation('push');
+-export const replace = updateLocation('replace');
++export function push(...args) {
++    return updateLocation('push')(...args);
++}
++export function replace(...args) {
++    return updateLocation('replace')(...args);
++}
+ export const go = updateLocation('go');
+ export const goBack = updateLocation('goBack');
+ export const goForward = updateLocation('goForward');
+diff --git a/build/es6/actions.js.map b/build/es6/actions.js.map
+index 6d37dc3db2662bd53d9ebb4cbda97ce642b1c1c9..c3519c38fee91a237389b5c213da7c8071219206 100644
+--- a/build/es6/actions.js.map
++++ b/build/es6/actions.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"actions.js","sourceRoot":"","sources":["../../src/actions.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,MAAM,mBAAmB,GAAG,8BAA8B,CAAC;AAClE,MAAM,CAAC,MAAM,eAAe,GAAG,0BAA0B,CAAC;AAY1D,MAAM,CAAC,MAAM,oBAAoB,GAAG,CAAC,QAAkB,EAAE,MAAc,EAAE,EAAE,CAAC,CAAC;IAC1E,IAAI,EAAE,eAAyC;IAC/C,OAAO,EAAE,EAAE,QAAQ,EAAE,MAAM,EAA4C;CACzE,CAAC,CAAC;AAYH,SAAS,cAAc,CAA2B,MAAS;IACxD,gDAAgD;IAChD,OAAO,CAAC,GAAG,IAA4B,EAAmD,EAAE,CAAC,CAAC;QAC3F,IAAI,EAAE,mBAAiD;QACvD,OAAO,EAAE,EAAE,MAAM,EAAE,IAAI,EAAE;KAC3B,CAAC,CAAC;AACN,CAAC;AAED,MAAM,CAAC,MAAM,IAAI,GAE2C,cAAc,CAAC,MAAM,CAAC,CAAC;AACnF,MAAM,CAAC,MAAM,OAAO,GAE2C,cAAc,CAAC,SAAS,CAAC,CAAC;AACzF,MAAM,CAAC,MAAM,EAAE,GAE2C,cAAc,CAAC,IAAI,CAAC,CAAC;AAC/E,MAAM,CAAC,MAAM,MAAM,GAChB,cAAc,CAAC,QAAQ,CAAC,CAAC;AAC5B,MAAM,CAAC,MAAM,SAAS,GACnB,cAAc,CAAC,WAAW,CAAC,CAAC;AAC/B,gDAAgD;AAChD,MAAM,CAAC,MAAM,IAAI,GACd,cAAc,CAAC,MAAM,CAAC,CAAC;AAC1B,gDAAgD;AAChD,MAAM,CAAC,MAAM,OAAO,GACjB,cAAc,CAAC,SAAS,CAAC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"actions.js","sourceRoot":"","sources":["../../src/actions.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,MAAM,mBAAmB,GAAG,8BAA8B,CAAC;AAClE,MAAM,CAAC,MAAM,eAAe,GAAG,0BAA0B,CAAC;AAY1D,MAAM,CAAC,MAAM,oBAAoB,GAAG,CAAC,QAAkB,EAAE,MAAc,EAAE,EAAE,CAAC,CAAC;IAC1E,IAAI,EAAE,eAAyC;IAC/C,OAAO,EAAE,EAAE,QAAQ,EAAE,MAAM,EAA4C;CACzE,CAAC,CAAC;AAYH,SAAS,cAAc,CAA2B,MAAS;IACxD,gDAAgD;IAChD,OAAO,CAAC,GAAG,IAA4B,EAAmD,EAAE,CAAC,CAAC;QAC3F,IAAI,EAAE,mBAAiD;QACvD,OAAO,EAAE,EAAE,MAAM,EAAE,IAAI,EAAE;KAC3B,CAAC,CAAC;AACN,CAAC;AAED,MAAM,UAAU,IAAI,CACjB,GAAG,IAAoC;IAEvC,OAAO,cAAc,CAAC,MAAM,CAAC,CAAC,GAAG,IAAI,CAAC,CAAC;AAC1C,CAAC;AACD,MAAM,UAAU,OAAO,CACpB,GAAG,IAAuC;IAE1C,OAAO,cAAc,CAAC,SAAS,CAAC,CAAC,GAAG,IAAI,CAAC,CAAC;AAC7C,CAAC;AACD,MAAM,CAAC,MAAM,EAAE,GAE2C,cAAc,CAAC,IAAI,CAAC,CAAC;AAC/E,MAAM,CAAC,MAAM,MAAM,GAChB,cAAc,CAAC,QAAQ,CAAC,CAAC;AAC5B,MAAM,CAAC,MAAM,SAAS,GACnB,cAAc,CAAC,WAAW,CAAC,CAAC;AAC/B,gDAAgD;AAChD,MAAM,CAAC,MAAM,IAAI,GACd,cAAc,CAAC,MAAM,CAAC,CAAC;AAC1B,gDAAgD;AAChD,MAAM,CAAC,MAAM,OAAO,GACjB,cAAc,CAAC,SAAS,CAAC,CAAC"}
+\ No newline at end of file
