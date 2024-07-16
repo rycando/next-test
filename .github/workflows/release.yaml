@@ -9,7 +9,7 @@ on:
       - '**'
 
 env:
-  DEPLOY_TARGET: ${{ (github.ref == 'refs/heads/main' && 'prod')|| (github.ref == 'refs/heads/stage' && 'stage') || 'preview' }}
+  DEPLOY_TARGET: ${{ (github.ref == 'refs/heads/master' && 'prod')|| (github.ref == 'refs/heads/stage' && 'stage') || 'preview' }}
   VERCEL_ORG_ID: team_soCklNDTKDttFPPmgVM6BHKU
   VERCEL_PROJECT_ID: prj_uSLsj4TjVaoOR99tuPlKW0sycZrP
 
@@ -51,7 +51,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/master') && github.event_name == 'push' && needs.release.outputs.releasable == 'true'
+    if: (github.ref == 'refs/heads/master') && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
       - name: Install script dependencies
