@@ -51,7 +51,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main') && github.event_name == 'push' && needs.release.outputs.releasable == 'true'
+    if: (github.ref == 'refs/heads/master') && github.event_name == 'push' && needs.release.outputs.releasable == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Install script dependencies
